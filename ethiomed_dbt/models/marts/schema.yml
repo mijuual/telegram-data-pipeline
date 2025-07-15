@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: dim_channels
+    description: "Unique Telegram channels"
+    columns:
+      - name: channel_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_dates
+    description: "Calendar date dimension"
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_messages
+    description: "Fact table containing all messages extracted from Telegram channels."
+
+    columns:
+      - name: message_id
+        description: "Unique ID of the message."
+      - name: channel_id
+        description: "Foreign key referencing dim_channels."
+      - name: date_id
+        description: "Foreign key referencing dim_dates."
+
+  - name: fct_image_detections
+    description: "Links message-level object detections from YOLOv8 to fct_messages"
+    columns:
+      - name: message_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('fct_messages')
+              field: message_id
+      - name: object_class
+        tests:
+          - not_null
+      - name: confidence_score
+        tests:
+          - not_null
+
