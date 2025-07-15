@@ -1,4 +1,9 @@
 .venv
 .env
-data
 logs
+data
+
+etl_api/__pycache__/
+script/yolov8n.pt
+
+notebook/yolov8n.pt
