@@ -1,11 +1,11 @@
-# routers/search.py
-
 from fastapi import APIRouter
 from db import get_db_connection
+from schemas import MessageResult
+from typing import List
 
 router = APIRouter(prefix="/api/search", tags=["Search"])
 
-@router.get("/messages")
+@router.get("/messages", response_model=List[MessageResult])
 def search_messages(query: str):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -19,6 +19,11 @@ def search_messages(query: str):
         LIMIT 50
     """
     cur.execute(sql, (f"%{query}%",))
-    result = cur.fetchall()
+    rows = cur.fetchall()
     conn.close()
-    return {"results": result}
+    return [MessageResult(
+        message_id=row[0],
+        channel_title=row[1],
+        message_text=row[2],
+        date=row[3]
+    ) for row in rows]

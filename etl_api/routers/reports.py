@@ -1,11 +1,11 @@
-# routers/reports.py
-
 from fastapi import APIRouter
 from db import get_db_connection
+from schemas import TopProduct
+from typing import List
 
 router = APIRouter(prefix="/api/reports", tags=["Reports"])
 
-@router.get("/top-products")
+@router.get("/top-products", response_model=List[TopProduct])
 def top_products(limit: int = 10):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -17,6 +17,6 @@ def top_products(limit: int = 10):
         LIMIT %s
     """
     cur.execute(query, (limit,))
-    result = cur.fetchall()
+    rows = cur.fetchall()
     conn.close()
-    return {"top_products": result}
+    return [TopProduct(object_class=row[0], mentions=row[1]) for row in rows]

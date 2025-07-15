@@ -1,11 +1,11 @@
-# routers/channels.py
-
 from fastapi import APIRouter
 from db import get_db_connection
+from schemas import ChannelActivityItem
+from typing import List
 
 router = APIRouter(prefix="/api/channels", tags=["Channels"])
 
-@router.get("/{channel_name}/activity")
+@router.get("/{channel_name}/activity", response_model=List[ChannelActivityItem])
 def channel_activity(channel_name: str):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -19,6 +19,6 @@ def channel_activity(channel_name: str):
         ORDER BY d.date
     """
     cur.execute(query, (channel_name,))
-    result = cur.fetchall()
+    rows = cur.fetchall()
     conn.close()
-    return {"activity": result}
+    return [ChannelActivityItem(date=row[0], message_count=row[1]) for row in rows]
