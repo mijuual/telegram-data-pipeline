@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: public  # your table lives in the 'public' schema
+    tables:
+      - name: stg_image_detections
